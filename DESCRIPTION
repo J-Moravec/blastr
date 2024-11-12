@@ -1,0 +1,18 @@
+Package: blastr
+Type: Package
+Title: binding to NCBI blast
+Description: blastr provides dependency-free binding to the NCBI blast
+    as well as a few useful functions.
+Version: 0.0.1
+Date: 2024-11-12
+Authors@R:
+    person(
+        given = "Jiří",
+        family = "Moravec",
+        role = c("aut", "cre"),
+        email = "jiri.c.moravec@gmail.com"
+        )
+Encoding: UTF-8
+License: GPL (>= 3)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
