@@ -2,6 +2,11 @@ workdir = tempdir()
 datadir = "../data"
 name = "GCF_000091225.2.fna"
 
+if(!nzchar(Sys.which("makeblastdb"))){
+    message("SKIP test-make_blast_db.r -- no makeblastdb binary")
+    return(invisible())
+    }
+
 
 TEST_SET("make_blast_db creates db from fasta", {
     file.copy(

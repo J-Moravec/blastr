@@ -22,6 +22,8 @@
 #' @param outfmt **optional** output format, defaults to `0` (Pairwise).
 #' @param args **optional** a character vector of additional arguments passed to blast.
 #' @return results of BLAST run in a requested format.
+#'
+#' @export
 blast = function(
     query,
     subject = NULL,
@@ -71,36 +73,36 @@ blast = function(
     }
 
 
-# @rdname blast
-# @export
+#' @rdname blast
+#' @export
 blastn = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
     blast(query, subject, db, out, outfmt, args, type = "blastn")
     }
 
 
-# @rdname blast
-# @export
+#' @rdname blast
+#' @export
 blastp = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
     blast(query, subject, db, out, outfmt, args, type= "blastp")
     }
 
 
-# @rdname blast
-# @export
+#' @rdname blast
+#' @export
 blastx = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
     blast(query, subject, db, out, outfmt, args, type= "blastx")
     }
 
 
-# @rdname blast
-# @export
+#' @rdname blast
+#' @export
 tblastn = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
     blast(query, subject, db, out, outfmt, args, type= "tblastn")
     }
 
 
-# @rdname blast
-# @export
+#' @rdname blast
+#' @export
 tblastx = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
     blast(query, subject, db, out, outfmt, args, type= "tblastx")
     }

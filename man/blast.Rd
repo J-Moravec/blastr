@@ -2,6 +2,11 @@
 % Please edit documentation in R/blast.r
 \name{blast}
 \alias{blast}
+\alias{blastn}
+\alias{blastp}
+\alias{blastx}
+\alias{tblastn}
+\alias{tblastx}
 \title{Run BLAST query}
 \usage{
 blast(
@@ -9,6 +14,51 @@ blast(
   subject = NULL,
   db = NULL,
   type = NULL,
+  out = NULL,
+  outfmt = NULL,
+  args = NULL
+)
+
+blastn(
+  query,
+  subject = NULL,
+  db = NULL,
+  out = NULL,
+  outfmt = NULL,
+  args = NULL
+)
+
+blastp(
+  query,
+  subject = NULL,
+  db = NULL,
+  out = NULL,
+  outfmt = NULL,
+  args = NULL
+)
+
+blastx(
+  query,
+  subject = NULL,
+  db = NULL,
+  out = NULL,
+  outfmt = NULL,
+  args = NULL
+)
+
+tblastn(
+  query,
+  subject = NULL,
+  db = NULL,
+  out = NULL,
+  outfmt = NULL,
+  args = NULL
+)
+
+tblastx(
+  query,
+  subject = NULL,
+  db = NULL,
   out = NULL,
   outfmt = NULL,
   args = NULL
