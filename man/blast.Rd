@@ -4,25 +4,47 @@
 \alias{blast}
 \title{Run BLAST query}
 \usage{
-blast(query, subject = NULL, db = NULL, type = "blastn", out, outfmt)
+blast(
+  query,
+  subject = NULL,
+  db = NULL,
+  type = NULL,
+  out = NULL,
+  outfmt = NULL,
+  args = NULL
+)
 }
 \arguments{
-\item{query}{a fasta file or a fasta object}
+\item{query}{a fasta file or a sequences object.}
 
-\item{subject}{\strong{optional} fasta file or a fasta object against which to blast, see details}
+\item{subject}{\strong{optional} fasta file or a sequences object against which to blast,
+one of subject or db needs to be specified.}
 
-\item{db}{\strong{optional} a database created from \code{\link[=make_blast_db]{make_blast_db()}}, see details}
+\item{db}{\strong{optional} a database created from \code{\link[=make_blast_db]{make_blast_db()}}
+one of subject or db needs to be specified.}
 
 \item{type}{\strong{optional} type of BLAST to run, one of \code{blastn}, \code{blastp}, \code{blastx},
 \code{tblastn} or \code{tblastx}.}
 
-\item{out}{output path}
+\item{out}{\strong{optional} output path to store BLAST results.}
 
-\item{outfmt}{output format}
+\item{outfmt}{\strong{optional} output format, defaults to \code{0} (Pairwise).}
+
+\item{args}{\strong{optional} a character vector of additional arguments passed to blast.}
 }
 \value{
-dunno
+results of BLAST run in a requested format.
 }
 \description{
-Perform BLAST search
+Perform local BLAST search using requested BLAST type (blastn, blastp., etc.).
+}
+\details{
+If \code{query} or \code{subject} are the sequnces from \code{\link[=read_fasta]{read_fasta()}}, these are saved into
+a tempfile and their filenames are passed to the blast.
+
+Exactly one of \code{subject} and \code{db} must be specified.
+
+The output of blast run is stored in a file specified by the \code{out} argument.
+The output is then read and returned. If \code{out = NULL}, the output is stored in a tempfile
+and will be removed at the end of the current R session.
 }
