@@ -93,7 +93,7 @@ is_sequences = function(x){
     # length of path is essentially unlimited (OS and filesystem specific)
     # but length of file-names is typically shorter than 256 (OS and filesystem specific)
     # since we don't have path separator (previous test), we test for filename length
-    if(any(nchar(y) > 256)) return(FALSE)
+    if(any(nchar(y) > 256)) return(TRUE)
 
     # sequences don't have extension
     if(any(tools::file_ext(y) != "")) return(FALSE)
