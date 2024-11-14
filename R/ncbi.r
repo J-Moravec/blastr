@@ -137,6 +137,8 @@ ncbi_format_mapping_table = function(id, assembly_name, formats = NULL){
 #' @param compress **optional** compress the extracted files using [gzip()].
 #' @param overwrite **optional** overwrite existing files.
 #' @param keep **optional** keep the downloaded archive
+#'
+#' @export
 ncbi = function(
     id,
     formats = NULL,
@@ -152,6 +154,9 @@ ncbi = function(
 
     if(is.null(dir))
         dir = id
+
+    if(!dir.exists(dir))
+        dir.create(dir, recursive = TRUE)
 
     targets = file.path(dir, ncbi_format_mapping_table(id, "phony", formats)$new)
     if(compress)
@@ -192,15 +197,14 @@ ncbi_download = function(
     if(file.exists(dest) && !overwrite)
         return(invisible(dest))
 
-    formats = match.arg(formats, ncbi_formats, several.ok = TRUE)
+    if(!is.null(formats)){
+        formats = match.arg(formats, ncbi_formats, several.ok = TRUE)
+        formats = paste0(formats, collapse = ",")
+        formats = paste0("?include_annotation_type=", formats)
+        }
 
-    formats = paste0(formats, collapse = ",")
-
-    url = paste0(
-        ncbi_api_url,
-        id, "/download?include_annotation_type=",
-        formats
-        )
+    url = paste(ncbi_api_url, id, "download", sep = "/")
+    url = paste0(url, formats)
 
     # Remove file if something stopped the download
     ok = FALSE
@@ -252,26 +256,27 @@ ncbi_flatten = function(
     if(all(file.exists(new_files)) && !overwrite)
         return(invisible(new_files))
 
-    y = ncbi_extract(archive, dir = dir, keep = keep)
+    files = ncbi_extract(archive, dir = dir, keep = keep)
     assembly_name = get_assembly_name(
-        file.path(y, "ncbi_dataset", "data", "assembly_data_report.jsonl")
+        file.path(dir, "ncbi_dataset", "data", "assembly_data_report.jsonl")
         )
     mapping = ncbi_format_mapping_table(prefix, assembly_name, formats)
+    old_files = file.path(dir, mapping$old)
 
     # safety check
-    files = list.files(y, recursive = TRUE)
-    if(!all(mapping$old %in% files)){
-        missing = mapping$formats[mapping$old %nin% files]
+    if(!all(old_files %in% files)){
+        missing = mapping$formats[old_files %nin% files]
         stop("Some of the requested formats are not in the NCBI archive:\n", toString(missing))
         }
 
     # move and remove
-    old_files = file.path(y, mapping$old)
     file.rename(old_files, new_files) # no copying involved, should be faster
 
     # always remove the folder
-    if(TRUE)
-        unlink(y, recursive = TRUE, force = TRUE)
+    if(TRUE){
+        unlink(files, recursive = TRUE, force = TRUE)
+        unlink(file.path(dir, "ncbi_dataset"), recursive = TRUE, force = TRUE)
+        }
 
     invisible(new_files)
     }
@@ -289,12 +294,13 @@ ncbi_extract = function(archive, dir = NULL, keep = FALSE){
     if(ext != "zip")
         stop(paste0("Unrecognised extension '", ext, "'. Only zip archives are supported.")) 
 
+    files = file.path(dir, utils::unzip(archive, list = TRUE)$Name)
     utils::unzip(archive, exdir = dir, unzip = "unzip")
 
     if(!keep)
         file.remove(archive)
 
-    invisible(dir)
+    invisible(files)
     }
 
 
