@@ -69,7 +69,11 @@ blast = function(
     if(errcode != 0)
         stop(type, " encountered error.")
 
-    readLines(out)
+    if(!is.null(outfmt) && outfmt %in% c(6,7,10)){
+        blast_format(out, outfmt = outfmt)
+        } else {
+        readLines(out)
+        }
     }
 
 
@@ -105,4 +109,35 @@ tblastn = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, 
 #' @export
 tblastx = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
     blast(query, subject, db, out, outfmt, args, type= "tblastx")
+    }
+
+
+blast_format = function(x, text = NULL, outfmt = NULL){
+    # parse only known formats
+    if(is.null(outfmt) || !(outfmt %in% c(6, 7, 10))){
+        y = if(is.null(text)) readLines(x) else text
+        return(y)
+        }
+
+    # TODO parse @delim
+    # so far we assume the default output
+    sep = if(outfmt == 10) "," else "\t"
+    x = if(is.null(text)) x else textConnection(text)
+    y = read.table(x, sep = sep)
+    names(y) = c(
+        "query",
+        "subject",
+        "% identity",
+        "alignment length",
+        "mismatches",
+        "gap pens",
+        "query start",
+        "query end",
+        "subject start",
+        "subject end",
+        "evalue",
+        "bit score"
+        )
+
+    y
     }
