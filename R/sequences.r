@@ -5,6 +5,13 @@
 #'
 #' No checks are performed, malformed input might lead to malformed output.
 #'
+#' `read_fasta()` and `write_fasta()` read and write sequences in a fasta format.
+#'
+#' `is_sequences()` tests if the passed object are sequences. In R, operations
+#' tend to typically not preserve attributes, like class. `in_sequences()` thus
+#' rans several tests instead, but these are only heuristics. If you want to be sure,
+#' reassign the class attribute such as with `attr(x, "class") = "sequences"`.
+#'
 #' @param file input or output file with fasta sequences, can be gzipped.
 #' @param x a named character vector assumed to be sequences.
 #' @param ... arguments passed to the print method (currently unused).
@@ -20,11 +27,12 @@
 #' seq2 = read_fasta(fasta)
 #' identical(seq1, seq2)
 #'
-#' @name fasta
+#' @name sequences
+#' @aliases fasta
 NULL
 
 
-#' @rdname fasta
+#' @rdname sequences
 #' @export
 read_fasta = function(file){
     text = readLines(file)
@@ -46,7 +54,7 @@ read_fasta = function(file){
     }
 
 
-#' @rdname fasta
+#' @rdname sequences
 #' @param nchar **optional** a number of characters per line
 #' @export
 write_fasta = function(x, file = "", nchar = 80){
@@ -68,7 +76,33 @@ write_fasta = function(x, file = "", nchar = 80){
     writeLines(text, file)
     }
 
-#' @rdname fasta
+
+#' @rdname sequences
+#' @export
+is_sequences = function(x){
+    y = utils::head(x)
+
+    # many operations remove attributes (such as class)
+    # e.g.,: head(x) will lose the class of x
+    if(inherits(x, "sequences")) return(TRUE)
+
+    # sequences don't have "/", "\" or "\\ paths separators, paths do
+    if(any(grepl("/|\\|\\\\", y))) return(FALSE)
+
+    # paths are typically shorter than sequences
+    # length of path is essentially unlimited (OS and filesystem specific)
+    # but length of file-names is typically shorter than 256 (OS and filesystem specific)
+    # since we don't have path separator (previous test), we test for filename length
+    if(any(nchar(y) > 256)) return(FALSE)
+
+    # sequences don't have extension
+    if(any(tools::file_ext(y) != "")) return(FALSE)
+
+    TRUE
+    }
+
+
+#' @rdname sequences
 #' @export
 print.sequences = function(x, ...){
     print(unclass(x))

@@ -45,10 +45,10 @@ blast = function(
     if(!xor(is.null(subject), is.null(db)))
         stop("Exactly one of subject or db must be specified.")
 
-    if(inherits(query, "sequences"))
+    if(is_sequences(query))
         query = write_fasta_temp(query)
 
-    if(inherits(subject, "sequences"))
+    if(is_sequences(subject))
         subject = write_fasta_temp(subject)
 
     if(is.null(out)){
