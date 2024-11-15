@@ -123,18 +123,18 @@ blast_format = function(x, text = NULL, outfmt = NULL){
     # so far we assume the default output
     sep = if(outfmt == 10) "," else "\t"
     x = if(is.null(text)) x else textConnection(text)
-    y = read.table(x, sep = sep)
+    y = utils::read.table(x, sep = sep)
     names(y) = c(
         "query",
         "subject",
-        "% identity",
-        "alignment length",
+        "perc_identity",
+        "alignment_length",
         "mismatches",
-        "gap pens",
-        "query start",
-        "query end",
-        "subject start",
-        "subject end",
+        "gap_pens",
+        "query_start",
+        "query_end",
+        "subject_start",
+        "subject_end",
         "evalue",
         "bit score"
         )

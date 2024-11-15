@@ -12,5 +12,5 @@ TEST_SET("BLAST produce expected result", {
     subject = read_fasta(file.path(datadir, name))
     query = subject[1] |> substring(1, 100) |> structure(class = "sequences")
 
-    TEST(length(blastn(query, subject, outfmt = 6)) == 4)
+    TEST(nrow(blastn(query, subject, outfmt = 6)) == 4)
 })
