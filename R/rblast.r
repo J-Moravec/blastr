@@ -5,7 +5,7 @@
 #' BLAST reciprocal best hit search will first perform a forward search, take the best hits,
 #' and then performs a backward search using these best hits. If the sequence used for
 #' the forward search are identified as a best hit in the backward search, the matched
-#' subject are reported as orthologs.
+#' subject are reported.
 #'
 #' @param x id or names of the sequences to be blasted, id is the first space-separated part
 #' of the sequence name and is intepreted by blast as query name
@@ -14,9 +14,9 @@
 #' @param dir = "." **optional** wokring directory
 #' @param keep **optional** keep blast searches, these are returned together with normal output
 #' in a list
-#' @return if `keep = FALSE`, a data.frame summarizing the search with query name, identified
-#' ortholog, percentage of their identity, alignment length, and number of mismatches.
-#' Where ortholog wasn't identified, values are `NA`.
+#' @return if `keep = FALSE`, a data.frame summarizing the search with query name, maching
+#' subject, percentage of their identity, alignment length, and number of mismatches.
+#' Where subject wasn't identified, values are `NA`.
 #' If `keep = TRUE`, a list containing the above data.frame as well as results from the forward
 #' and backward searches, together with the best hits in both directions.
 #'
@@ -65,14 +65,14 @@ rblast = function(
 
     res = data.frame(
         "query" = forward_best$query,
-        "ortholog" = forward_best$subject,
+        "subject" = forward_best$subject,
         "perc_identity" = forward_best$perc_identity,
         "alignment_length" = forward_best$alignment_length,
         "mismatches" = forward_best$mismatches,
         "annotation" = subject_names[subject_names_match]
         )
 
-    # remove what is actually not an ortholog
+    # remove what is actually not a match
     res[forward_best$query != backward_best$subject, -1] = NA
     res = res[match(x, res$query),]
     rownames(res) = NULL
@@ -80,7 +80,7 @@ rblast = function(
 
     if(keep){
         res = list(
-            "orthologs" = res,
+            "rblast" = res,
             "forward" = forward,
             "forward_best" = forward_best,
             "backward" = backward,

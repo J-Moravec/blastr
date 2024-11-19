@@ -27,9 +27,9 @@ of the sequence name and is intepreted by blast as query name}
 in a list}
 }
 \value{
-if \code{keep = FALSE}, a data.frame summarizing the search with query name, identified
-ortholog, percentage of their identity, alignment length, and number of mismatches.
-Where ortholog wasn't identified, values are \code{NA}.
+if \code{keep = FALSE}, a data.frame summarizing the search with query name, maching
+subject, percentage of their identity, alignment length, and number of mismatches.
+Where subject wasn't identified, values are \code{NA}.
 If \code{keep = TRUE}, a list containing the above data.frame as well as results from the forward
 and backward searches, together with the best hits in both directions.
 }
@@ -40,5 +40,5 @@ Perform BLAST reciprocal best hit (RBH) search.
 BLAST reciprocal best hit search will first perform a forward search, take the best hits,
 and then performs a backward search using these best hits. If the sequence used for
 the forward search are identified as a best hit in the backward search, the matched
-subject are reported as orthologs.
+subject are reported.
 }

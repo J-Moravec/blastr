@@ -31,10 +31,10 @@ This way getting the first or the second element is easier.
 s = strfsplit("foo bar", " ", fixed = TRUE)
 identical(s, list("foo", "bar"))
 
-r = strfsplit("foo", " ", fixed = TRUE)
+s = strfsplit("foo", " ", fixed = TRUE)
 identical(s, list("foo", NA_character_))
 
-r = strfsplit(NA, " ", fixed = TRUE)
-identical(r, list(NA_character_, NA_character_))
+s = strfsplit(NA, " ", fixed = TRUE)
+identical(s, list(NA_character_, NA_character_))
 
 }
