@@ -19,7 +19,7 @@ TEST_SET("make_blast_db creates db from fasta", {
         file.path(workdir, name)
         )
 
-    make_blast_db(input, file.path(workdir, "db", name))
+    TEST_NOT_ERROR(make_blast_db(input, file.path(workdir, "db", name)))
     dir.remove(file.path(workdir, "db"))
     file.remove(input)
     })
@@ -32,7 +32,14 @@ TEST_SET("make_blast_db creates db from gzipped fasta", {
         input
         )
 
-    make_blast_db(input, file.path(workdir, "db", name))
+    TEST_NOT_ERROR(make_blast_db(input, file.path(workdir, "db", name)))
     dir.remove(file.path(workdir, "db"))
     file.remove(input)
+    })
+
+
+TEST_SET("make_blast_db creates db from sequences", {
+    input = read_fasta(file.path(datadir, paste0(name, ".gz")))
+
+    TEST_NOT_ERROR(make_blast_db(input, file.path(workdir, "db", name)))
     })

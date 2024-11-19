@@ -89,3 +89,10 @@ TEST_ERROR = function(expr, msg = "does not signal required error!", pattern = "
     e = tryCatch(expr, error = \(e) e)
     (is.error(e) && grepl(pattern, conditionMessage(e))) |> TEST(call = call, msg = msg)
     }
+
+
+TEST_NOT_ERROR = function(expr, msg = "does signal error!", call = NULL){
+    call = if(is.null(call)) deparse(substitute(expr)) |> paste0(collapse = "")
+    e = tryCatch(expr, error = \(e) e)
+    is.error(e) |> not() |> TEST(call = call, msg = msg)
+    }

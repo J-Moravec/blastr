@@ -10,6 +10,9 @@
 #'
 #' @export
 make_blast_db = function(x, out, type = c("nucl", "prot"), title = NULL, verbose = FALSE){
+    if(is_sequences(x))
+        x = write_fasta_temp(x)
+
     if(identical(tools::file_ext(x), "gz")){
         y = tools::file_path_sans_ext(x) |> basename()
         x = gunzip(x, file.path(tempdir(), y), keep = TRUE)

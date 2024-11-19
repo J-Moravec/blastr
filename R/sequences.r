@@ -7,6 +7,9 @@
 #'
 #' `read_fasta()` and `write_fasta()` read and write sequences in a fasta format.
 #'
+#' `write_fasta_temp()` writes a fasta to a `tempfile()` and returns to file.
+#' Used internally to convert sequences into a file for NCBI+ BLAST calls.
+#'
 #' `is_sequences()` tests if the passed object are sequences. In R, operations
 #' tend to typically not preserve attributes, like class. `in_sequences()` thus
 #' rans several tests instead, but these are only heuristics. If you want to be sure,
@@ -15,9 +18,13 @@
 #' @param file input or output file with fasta sequences, can be gzipped.
 #' @param x a named character vector assumed to be sequences.
 #' @param ... arguments passed to the print method (currently unused).
-#' @return `read_fasta` returns a named character vector of sequences with class
-#' `c("sequences", "character") allowing for type-checking.
-#' `write_fasta` doesn't have return value.
+#' @return
+#' `read_fasta` returns a named character vector of sequences with class
+#' `c("sequences", "character") allowing for type-checking. Note that attributes
+#' like `class` are typically not preserved during various operations (e.g., `head()`).
+#' `write_fasta` doesn't have return value and is run for its side effects.
+#' `is_sequences()` returns a logical value.
+#' `write_fasta_temp()` returns a path to a tempfile.
 #'
 #' @examples
 #' seq1 = c("A" = "AAA", "B" = "BBB", "C" = "CCC")
@@ -106,4 +113,13 @@ is_sequences = function(x){
 #' @export
 print.sequences = function(x, ...){
     print(unclass(x))
+    }
+
+
+#' @rdname sequences
+#' @export
+write_fasta_temp = function(x){
+    file = tempfile()
+    write_fasta(x, file)
+    file
     }

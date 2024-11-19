@@ -35,12 +35,6 @@ blast = function(
     args = NULL,
     quiet = FALSE
     ){
-    write_fasta_temp = function(x){
-        file = tempfile()
-        write_fasta(x, file)
-        file
-        }
-
     types = c("blastn", "blastp", "blastx", "tblastn", "tblastx")
     type = match.arg(type, types)
 

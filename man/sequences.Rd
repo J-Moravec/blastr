@@ -7,6 +7,7 @@
 \alias{write_fasta}
 \alias{is_sequences}
 \alias{print.sequences}
+\alias{write_fasta_temp}
 \title{Read and write sequences in a fasta format}
 \usage{
 read_fasta(file)
@@ -16,6 +17,8 @@ write_fasta(x, file = "", nchar = 80)
 is_sequences(x)
 
 \method{print}{sequences}(x, ...)
+
+write_fasta_temp(x)
 }
 \arguments{
 \item{file}{input or output file with fasta sequences, can be gzipped.}
@@ -28,7 +31,7 @@ is_sequences(x)
 }
 \value{
 \code{read_fasta} returns a named character vector of sequences with class
-\verb{c("sequences", "character") allowing for type-checking. }write_fasta` doesn't have return value.
+\verb{c("sequences", "character") allowing for type-checking. Note that attributes like }class\verb{are typically not preserved during various operations (e.g.,}head()\verb{). }write_fasta\verb{doesn't have return value and is run for its side effects.}is_sequences()\verb{returns a logical value.}write_fasta_temp()` returns a path to a tempfile.
 }
 \description{
 Read and write DNA, RNA, or protein sequences in a fasta format.
@@ -38,6 +41,9 @@ Files compressed with \code{gzip} (extension \code{gz}) are supported.
 No checks are performed, malformed input might lead to malformed output.
 
 \code{read_fasta()} and \code{write_fasta()} read and write sequences in a fasta format.
+
+\code{write_fasta_temp()} writes a fasta to a \code{tempfile()} and returns to file.
+Used internally to convert sequences into a file for NCBI+ BLAST calls.
 
 \code{is_sequences()} tests if the passed object are sequences. In R, operations
 tend to typically not preserve attributes, like class. \code{in_sequences()} thus
