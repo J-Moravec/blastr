@@ -32,4 +32,7 @@ TEST_SET("is_sequences can correctly guess sequences", {
 
     # Ambiguous case, reported as a sequence
     TEST(is_sequences(basename(tmp))) # ambiguous?
+
+    # not sequences, but not path either
+    TEST(!is_sequences(NULL))
     })

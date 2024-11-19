@@ -87,12 +87,14 @@ write_fasta = function(x, file = "", nchar = 80){
 #' @rdname sequences
 #' @export
 is_sequences = function(x){
-    y = utils::head(x)
+    # NULL is not sequences (or path)
+    if(is.null(x)) return(FALSE)
 
     # many operations remove attributes (such as class)
     # e.g.,: head(x) will lose the class of x
     if(inherits(x, "sequences")) return(TRUE)
 
+    y = utils::head(x)
     # sequences don't have "/", "\" or "\\ paths separators, paths do
     if(any(grepl("/|\\|\\\\", y))) return(FALSE)
 
