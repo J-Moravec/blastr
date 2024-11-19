@@ -32,9 +32,14 @@ rblast = function(
 
     type = match.arg(type)
 
-    query_names = names(subject)
+    query_names = names(query)
     query_names_match = match_names(x, query_names)
-    x = sub(pattern = " .*", replacement = "")
+
+    # sanity check
+    if(any(lengths(query_names_match) != 1))
+        stop("Non-unique match of sequence names! This shouldn't happen.")
+
+    query_names_match = unlist(query_names_match)
 
     # first blast
     forward = blast(query[query_names_match], subject, outfmt = 6, type = type,
