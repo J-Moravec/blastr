@@ -11,7 +11,7 @@
 #' of the sequence name and is intepreted by blast as query name
 #' @param query,subject sequences of the query and target organisms
 #' @param type a type of blast, either nucleotide `blastn` or protein `blastp` blast
-#' @param dir = "." **optional** wokring directory
+#' @param query_db,subject_db **optional** pre-existing query and subject blast dabatases
 #' @param keep **optional** keep blast searches, these are returned together with normal output
 #' in a list
 #' @return if `keep = FALSE`, a data.frame summarizing the search with query name, maching
@@ -26,7 +26,8 @@ rblast = function(
     query,
     subject,
     type = c("blastn", "blastp"),
-    dir = ".",
+    query_db = NULL,
+    subject_db = NULL,
     keep = FALSE
     ){
 
@@ -34,32 +35,43 @@ rblast = function(
 
     x = strfsplit(x, " ", fixed = TRUE)[[1]]
 
-    query_names = names(query)
-    query_names_match = match_names(x, query_names)
+    query_names_match = match_names(x, names(query))
 
-    # sanity check
-    if(any(lengths(query_names_match) != 1))
-        stop("Non-unique match of sequence names! This shouldn't happen.")
+    db_type = switch(type,
+        "blastn" = "nucl",
+        "blastp" = "prot"
+        )
 
-    query_names_match = unlist(query_names_match)
+    if(is.null(query_db)){
+        query_db = file.path(tempdir(), "query")
+        make_blast_db(query, out = query_db, type = db_type)
+        }
+
+    if(is.null(subject_db)){
+        subject_db = file.path(tempdir(), "subject")
+        make_blast_db(subject, out = subject_db, type = db_type)
+        }
 
     # first blast
-    forward = blast(query[query_names_match], subject, outfmt = 6, type = type,
-                    args = "-max_target_seqs 5")
+    forward = blast(
+        query[query_names_match],
+        db = subject_db,
+        outfmt = 6,
+        type = type,
+        args = "-max_target_seqs 5"
+        )
     forward_best = forward |> split(~ query) |> lapply(utils::head, 1) |> do.call(what = rbind)
 
     subject_names = names(subject)
     subject_names_match = match_names(forward_best$subject, subject_names)
 
-    # sanity check
-    if(any(lengths(subject_names_match) != 1))
-        stop("Non-unique match of sequence names! This shouldn't happen.")
-
-    subject_names_match = unlist(subject_names_match)
-
     # second blast
-    backward = blast(subject[subject_names_match], query, outfmt = 6, type = type,
-                     args = "-max_target_seqs 5")
+    backward = blast(
+        subject[subject_names_match],
+        db = query_db, outfmt = 6,
+        type = type,
+        args = "-max_target_seqs 5"
+        )
     backward_best = backward |> split(~ query) |> lapply(utils::head, 1) |> do.call(what = rbind)
     backward_best = backward_best[forward_best$subject, ]
 
@@ -94,5 +106,11 @@ rblast = function(
 
 match_names = function(x, where){
     where = strfsplit(where, " ", fixed = TRUE)[[1]]
-    lapply(x, \(y) which(y == where)) |> stats::setNames(x)
+    y = lapply(x, \(y) which(y == where)) |> stats::setNames(x)
+
+    # sanity check
+    if(any(lengths(y) != 1))
+        stop("Non-unique match of sequence names! This shouldn't happen.")
+
+    unlist(y)
     }
