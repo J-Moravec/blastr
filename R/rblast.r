@@ -32,6 +32,8 @@ rblast = function(
 
     type = match.arg(type)
 
+    x = strfsplit(x, " ", fixed = TRUE)[[1]]
+
     query_names = names(query)
     query_names_match = match_names(x, query_names)
 
@@ -91,5 +93,6 @@ rblast = function(
 
 
 match_names = function(x, where){
-    lapply(paste0("^", x, "( |$)"), \(y) grep(y, where)) |> stats::setNames(x)
+    where = strfsplit(where, " ", fixed = TRUE)[[1]]
+    lapply(x, \(y) which(y == where)) |> stats::setNames(x)
     }
