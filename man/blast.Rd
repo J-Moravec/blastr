@@ -16,7 +16,8 @@ blast(
   type = NULL,
   out = NULL,
   outfmt = NULL,
-  args = NULL
+  args = NULL,
+  quiet = FALSE
 )
 
 blastn(
@@ -25,7 +26,8 @@ blastn(
   db = NULL,
   out = NULL,
   outfmt = NULL,
-  args = NULL
+  args = NULL,
+  quiet = FALSE
 )
 
 blastp(
@@ -34,7 +36,8 @@ blastp(
   db = NULL,
   out = NULL,
   outfmt = NULL,
-  args = NULL
+  args = NULL,
+  quiet = FALSE
 )
 
 blastx(
@@ -43,7 +46,8 @@ blastx(
   db = NULL,
   out = NULL,
   outfmt = NULL,
-  args = NULL
+  args = NULL,
+  quiet = FALSE
 )
 
 tblastn(
@@ -52,7 +56,8 @@ tblastn(
   db = NULL,
   out = NULL,
   outfmt = NULL,
-  args = NULL
+  args = NULL,
+  quiet = FALSE
 )
 
 tblastx(
@@ -61,7 +66,8 @@ tblastx(
   db = NULL,
   out = NULL,
   outfmt = NULL,
-  args = NULL
+  args = NULL,
+  quiet = FALSE
 )
 }
 \arguments{
@@ -81,6 +87,8 @@ one of subject or db needs to be specified.}
 \item{outfmt}{\strong{optional} output format, defaults to \code{0} (Pairwise).}
 
 \item{args}{\strong{optional} a character vector of additional arguments passed to blast.}
+
+\item{quiet}{\strong{optional} if TRUE, any blast output to stdout and stderr is suppressed}
 }
 \value{
 results of BLAST run in a requested format.

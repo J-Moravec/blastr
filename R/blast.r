@@ -21,6 +21,7 @@
 #' @param out **optional** output path to store BLAST results.
 #' @param outfmt **optional** output format, defaults to `0` (Pairwise).
 #' @param args **optional** a character vector of additional arguments passed to blast.
+#' @param quiet **optional** if TRUE, any blast output to stdout and stderr is suppressed
 #' @return results of BLAST run in a requested format.
 #'
 #' @export
@@ -31,7 +32,8 @@ blast = function(
     type = NULL,
     out = NULL,
     outfmt = NULL,
-    args = NULL
+    args = NULL,
+    quiet = FALSE
     ){
     write_fasta_temp = function(x){
         file = tempfile()
@@ -64,7 +66,8 @@ blast = function(
         if(!is.null(args)) args
         )
 
-    errcode = system2(type, args)
+    std = if(isFALSE(quiet)) "" else FALSE
+    errcode = system2(type, args, stderr = std, stdin = std)
 
     if(errcode != 0)
         stop(type, " encountered error.")
@@ -79,36 +82,56 @@ blast = function(
 
 #' @rdname blast
 #' @export
-blastn = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
-    blast(query, subject, db, out, outfmt, args, type = "blastn")
+blastn = function(
+    query, subject = NULL, db = NULL,
+    out = NULL, outfmt = NULL,
+    args = NULL, quiet = FALSE
+    ){
+    blast(query, subject, db, out, outfmt, args, type = "blastn", quiet = quiet)
     }
 
 
 #' @rdname blast
 #' @export
-blastp = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
-    blast(query, subject, db, out, outfmt, args, type= "blastp")
+blastp = function(
+    query, subject = NULL, db = NULL,
+    out = NULL, outfmt = NULL,
+    args = NULL, quiet = FALSE
+    ){
+    blast(query, subject, db, out, outfmt, args, type= "blastp", quiet = quiet)
     }
 
 
 #' @rdname blast
 #' @export
-blastx = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
-    blast(query, subject, db, out, outfmt, args, type= "blastx")
+blastx = function(
+    query, subject = NULL, db = NULL,
+    out = NULL, outfmt = NULL,
+    args = NULL, quiet = FALSE
+    ){
+    blast(query, subject, db, out, outfmt, args, type= "blastx", quiet = quiet)
     }
 
 
 #' @rdname blast
 #' @export
-tblastn = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
-    blast(query, subject, db, out, outfmt, args, type= "tblastn")
+tblastn = function(
+    query, subject = NULL, db = NULL,
+    out = NULL, outfmt = NULL,
+    args = NULL, quiet = FALSE
+    ){
+    blast(query, subject, db, out, outfmt, args, type= "tblastn", quiet = quiet)
     }
 
 
 #' @rdname blast
 #' @export
-tblastx = function(query, subject = NULL, db = NULL, out = NULL, outfmt = NULL, args = NULL){
-    blast(query, subject, db, out, outfmt, args, type= "tblastx")
+tblastx = function(
+    query, subject = NULL, db = NULL,
+    out = NULL, outfmt = NULL,
+    args = NULL, quiet = FALSE
+    ){
+    blast(query, subject, db, out, outfmt, args, type= "tblastx", quiet = quiet)
     }
 
 
