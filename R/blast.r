@@ -47,6 +47,16 @@ blast = function(
     if(is_sequences(subject))
         subject = write_fasta_temp(subject)
 
+    if(identical(tools::file_ext(query), "gz")){
+        y = tools::file_path_sans_ext(query) |> basename()
+        query = gunzip(query, file.path(tempdir(), y), keep = TRUE)
+        }
+
+    if(identical(tools::file_ext(subject), "gz")){
+        y = tools::file_path_sans_ext(subject) |> basename()
+        subject = gunzip(subject, file.path(tempdir(), y), keep = TRUE)
+        }
+
     if(is.null(out)){
         out = tempfile()
         }
@@ -61,7 +71,7 @@ blast = function(
         )
 
     std = if(isFALSE(quiet)) "" else FALSE
-    errcode = system2(type, args, stderr = std, stdin = std)
+    errcode = system2(type, args, stderr = std, stdout = std)
 
     if(errcode != 0)
         stop(type, " encountered error.")
