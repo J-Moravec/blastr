@@ -8,3 +8,10 @@ dir.size = function(x, recursive = TRUE){
 dir.remove = function(x, force = FALSE){
     unlink(x, recursive = TRUE, force = force)
     }
+
+
+temp.copy = function(x, ...){
+    copy = tempfile(...)
+    file.copy(x, copy)
+    copy
+    }
