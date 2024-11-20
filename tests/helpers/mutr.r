@@ -33,7 +33,7 @@ TEST_PRINT = function(){
 
 
 TEST = function(expr, msg = "is not TRUE!", call = NULL){
-    call = if(is.null(call)) deparse(substitute(expr)) |> paste0(collapse = "")
+    if(is.null(call)) call = deparse(substitute(expr)) |> paste0(collapse = "")
     res = try(expr, silent = TRUE)
 
     env = get(".TESTS", envir = globalenv())
@@ -85,14 +85,14 @@ not = function(x){
 
 
 TEST_ERROR = function(expr, msg = "does not signal required error!", pattern = "", call = NULL){
-    call = if(is.null(call)) deparse(substitute(expr)) |> paste0(collapse = "")
+    if(is.null(call)) call = deparse(substitute(expr)) |> paste0(collapse = "")
     e = tryCatch(expr, error = \(e) e)
     (is.error(e) && grepl(pattern, conditionMessage(e))) |> TEST(call = call, msg = msg)
     }
 
 
 TEST_NOT_ERROR = function(expr, msg = "does signal error!", call = NULL){
-    call = if(is.null(call)) deparse(substitute(expr)) |> paste0(collapse = "")
+    if(is.null(call)) call = deparse(substitute(expr)) |> paste0(collapse = "")
     e = tryCatch(expr, error = \(e) e)
     is.error(e) |> not() |> TEST(call = call, msg = msg)
     }
