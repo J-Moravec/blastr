@@ -1,8 +1,7 @@
 # mutr: minimal unit-testing framework
-#
-# a simplified copy-pastable version inspired by https://jera.com/techinfo/jtns/jtn002
-#
-# For a more feature-full version along with some goodies see the `mutr` package.
+# inspired by https://jera.com/techinfo/jtns/jtn002
+# version: 0.0.2
+# https://github.com/J-Moravec/mutr
 
 TEST_INIT = function(){
     env = new.env(parent = emptyenv())
@@ -54,7 +53,6 @@ TEST_SET = function(msg, expr){
 
     cat("", msg, "\n", sep = "")
     eval(expr)
-    #res = try(expr, silent = FALSE)
 
     invisible()
     }

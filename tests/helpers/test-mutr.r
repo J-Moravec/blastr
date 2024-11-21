@@ -1,8 +1,5 @@
-# Test for unit-tests
-#
-# This will test a simplified version of mutr used for self-testing
+# test-mutr.r: tests for the unit-testing framework mutr
 
-# helpers
 TEST__CHECK = function(fail, total, sets){
     env = get(".TESTS", envir = globalenv())
     stopifnot(env$FAIL == fail, env$TOTAL == total, env$SETS == sets)
