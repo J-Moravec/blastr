@@ -71,38 +71,52 @@ tblastx(
 )
 }
 \arguments{
-\item{query}{a fasta file or a sequences object.}
+\item{query}{A fasta file or a sequences object.}
 
-\item{subject}{\strong{optional} fasta file or a sequences object against which to blast,
-one of subject or db needs to be specified.}
+\item{subject}{Fasta file or a sequences object against which to blast,
+one of \verb{subject or }db` needs to be specified.}
 
-\item{db}{\strong{optional} a database created from \code{\link[=make_blast_db]{make_blast_db()}}
-one of subject or db needs to be specified.}
+\item{db}{A database created from \code{\link[=make_blast_db]{make_blast_db()}},
+one of \code{subject} or \code{db} needs to be specified.}
 
-\item{type}{\strong{optional} type of BLAST to run, one of \code{blastn}, \code{blastp}, \code{blastx},
-\code{tblastn} or \code{tblastx}.}
+\item{type}{Type of BLAST to run, one of \code{blastn}, \code{blastp}, \code{blastx},
+\code{tblastn} or \code{tblastx}, defaults to \code{blastn}.}
 
-\item{out}{\strong{optional} output path to store BLAST results.}
+\item{out}{An output path to store BLAST results, the default is to not store any results.}
 
-\item{outfmt}{\strong{optional} output format, defaults to \code{0} (Pairwise).}
+\item{outfmt}{BLAST output format, defaults to \code{0} (Pairwise).}
 
-\item{args}{\strong{optional} a character vector of additional arguments passed to blast.}
+\item{args}{AA character vector of additional arguments passed to \code{\link[=blast]{blast()}}.}
 
-\item{quiet}{\strong{optional} if TRUE, any blast output to stdout and stderr is suppressed}
+\item{quiet}{If \code{TRUE}, any blast output to stdout and stderr is suppressed,
+use this when using \code{\link[=blast]{blast()}} within a pipeline and you want to reduce the text output
+to console. This is also make potential error harder to debug. The default is \code{FALSE}.}
 }
 \value{
-results of BLAST run in a requested format.
+a character vector or a data.frame (for the tabular formats \code{outfmt = 6}, \code{7}, and
+\code{10}) containin the results of BLAST run.
 }
 \description{
 Perform local BLAST search using requested BLAST type (blastn, blastp., etc.).
+Arguments are passed to the NCBI BLAST+ software that must be intalled independently.
 }
 \details{
-If \code{query} or \code{subject} are the sequnces from \code{\link[=read_fasta]{read_fasta()}}, these are saved into
-a tempfile and their filenames are passed to the blast.
+The function \code{blast} implements the general logic of calling the NCBI BLAST+ using the
+\code{\link[=system2]{system2()}} interface. Other functions like \code{blastn}, \code{blastp} are calling \code{blast} with
+specified \code{type}. Use them if you want to be more specific in what blast search
+you are performing.
 
-Exactly one of \code{subject} and \code{db} must be specified.
+NCBI BLAST+ can process the subject database in a fasta format or in the form of database
+created using \code{\link[=make_blast_db]{make_blast_db()}}. For this reason, exactly one of \code{subject} or \code{db} must
+be specified. In practice, aside from very small queries, it is almost always more
+time-efficient to create the database even for one-time queries.
+If \code{query} or \code{subject} are the sequnces, such as from \code{\link[=read_fasta]{read_fasta()}}, these are saved into
+a tempfile and their filenames are passed to NCBI BLAST+.
 
 The output of blast run is stored in a file specified by the \code{out} argument.
 The output is then read and returned. If \code{out = NULL}, the output is stored in a tempfile
 and will be removed at the end of the current R session.
+
+If the \code{outfmt} is one of the tabular formats (6, 7, or 10), the NCBI BLAST+  is parsed
+and converted into a \code{data.frame}. As of now, field customization is not supported.
 }

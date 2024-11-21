@@ -1,28 +1,45 @@
 #' Run BLAST query
 #'
+#' @description
 #' Perform local BLAST search using requested BLAST type (blastn, blastp., etc.).
+#' Arguments are passed to the NCBI BLAST+ software that must be intalled independently.
 #'
-#' If `query` or `subject` are the sequnces from [read_fasta()], these are saved into
-#' a tempfile and their filenames are passed to the blast.
+#' @details
+#' The function `blast` implements the general logic of calling the NCBI BLAST+ using the
+#' [system2()] interface. Other functions like `blastn`, `blastp` are calling `blast` with
+#' specified `type`. Use them if you want to be more specific in what blast search
+#' you are performing.
 #'
-#' Exactly one of `subject` and `db` must be specified.
+#' NCBI BLAST+ can process the subject database in a fasta format or in the form of database
+#' created using [make_blast_db()]. For this reason, exactly one of `subject` or `db` must
+#' be specified. In practice, aside from very small queries, it is almost always more
+#' time-efficient to create the database even for one-time queries.
+#
+#' If `query` or `subject` are the sequnces, such as from [read_fasta()], these are saved into
+#' a tempfile and their filenames are passed to NCBI BLAST+.
 #'
 #' The output of blast run is stored in a file specified by the `out` argument.
 #' The output is then read and returned. If `out = NULL`, the output is stored in a tempfile
 #' and will be removed at the end of the current R session.
 #'
-#' @param query a fasta file or a sequences object.
-#' @param subject **optional** fasta file or a sequences object against which to blast,
-#' one of subject or db needs to be specified.
-#' @param db **optional** a database created from [make_blast_db()]
-#' one of subject or db needs to be specified.
-#' @param type **optional** type of BLAST to run, one of `blastn`, `blastp`, `blastx`,
-#' `tblastn` or `tblastx`.
-#' @param out **optional** output path to store BLAST results.
-#' @param outfmt **optional** output format, defaults to `0` (Pairwise).
-#' @param args **optional** a character vector of additional arguments passed to blast.
-#' @param quiet **optional** if TRUE, any blast output to stdout and stderr is suppressed
-#' @return results of BLAST run in a requested format.
+#' If the `outfmt` is one of the tabular formats (6, 7, or 10), the NCBI BLAST+  is parsed
+#' and converted into a `data.frame`. As of now, field customization is not supported.
+
+#' @param query A fasta file or a sequences object.
+#' @param subject Fasta file or a sequences object against which to blast,
+#' one of `subject or `db` needs to be specified.
+#' @param db A database created from [make_blast_db()],
+#' one of `subject` or `db` needs to be specified.
+#' @param type Type of BLAST to run, one of `blastn`, `blastp`, `blastx`,
+#' `tblastn` or `tblastx`, defaults to `blastn`.
+#' @param out An output path to store BLAST results, the default is to not store any results.
+#' @param outfmt BLAST output format, defaults to `0` (Pairwise).
+#' @param args AA character vector of additional arguments passed to [blast()].
+#' @param quiet If `TRUE`, any blast output to stdout and stderr is suppressed,
+#' use this when using [blast()] within a pipeline and you want to reduce the text output
+#' to console. This is also make potential error harder to debug. The default is `FALSE`.
+#' @return a character vector or a data.frame (for the tabular formats `outfmt = 6`, `7`, and
+#' `10`) containin the results of BLAST run.
 #'
 #' @export
 blast = function(
