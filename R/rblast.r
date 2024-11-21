@@ -12,6 +12,7 @@
 #' @param query,subject sequences of the query and target organisms
 #' @param type a type of blast, either nucleotide `blastn` or protein `blastp` blast
 #' @param query_db,subject_db **optional** pre-existing query and subject blast dabatases
+#' @param args **optional** a character vector of additional arguments passed to blast.
 #' @param keep **optional** keep blast searches, these are returned together with normal output
 #' in a list
 #' @return if `keep = FALSE`, a data.frame summarizing the search with query name, maching
@@ -28,10 +29,12 @@ rblast = function(
     type = c("blastn", "blastp"),
     query_db = NULL,
     subject_db = NULL,
+    args = NULL,
     keep = FALSE
     ){
 
     type = match.arg(type)
+    args = c(args, "-max_target_seqs 5")
 
     x = strfsplit(x, " ", fixed = TRUE)[[1]]
 
@@ -58,7 +61,7 @@ rblast = function(
         db = subject_db,
         outfmt = 6,
         type = type,
-        args = "-max_target_seqs 5"
+        args = args
         )
     forward_best = forward |> split(~ query) |> lapply(utils::head, 1) |> do.call(what = rbind)
 
@@ -70,7 +73,7 @@ rblast = function(
         subject[subject_names_match],
         db = query_db, outfmt = 6,
         type = type,
-        args = "-max_target_seqs 5"
+        args = args
         )
     backward_best = backward |> split(~ query) |> lapply(utils::head, 1) |> do.call(what = rbind)
     backward_best = backward_best[forward_best$subject, ]

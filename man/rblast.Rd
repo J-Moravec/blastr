@@ -11,6 +11,7 @@ rblast(
   type = c("blastn", "blastp"),
   query_db = NULL,
   subject_db = NULL,
+  args = NULL,
   keep = FALSE
 )
 }
@@ -23,6 +24,8 @@ of the sequence name and is intepreted by blast as query name}
 \item{type}{a type of blast, either nucleotide \code{blastn} or protein \code{blastp} blast}
 
 \item{query_db, subject_db}{\strong{optional} pre-existing query and subject blast dabatases}
+
+\item{args}{\strong{optional} a character vector of additional arguments passed to blast.}
 
 \item{keep}{\strong{optional} keep blast searches, these are returned together with normal output
 in a list}
