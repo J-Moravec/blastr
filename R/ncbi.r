@@ -89,7 +89,8 @@ ncbi_format_mapping_table = function(id, assembly_name, formats = NULL){
         c("CDS_FASTA", "cds_from_genomic.fna", id_ext("cds.fna")),
         c("PROT_FASTA", "protein.faa", id_ext("faa")),
         c("SEQUENCE_REPORT", "sequence_report.jsonl", id_ext("jsonl"))
-        ) |> do.call(what = rbind.data.frame) |> stats::setNames(c("formats", "old", "new"))
+        ) |> do.call(what = rbind.data.frame)
+    names(mapping) = c("formats", "old", "new")
     mapping[["old"]] = file.path("ncbi_dataset", "data", id, mapping[["old"]])
 
     if(!is.null(formats))
