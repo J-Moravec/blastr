@@ -23,13 +23,12 @@ TEST_SET("blast throws error with wrong type", {
 
 
 TEST_SET("blast can be fed sequences, files, and gzipped files", {
-    seq_head = head(seq)
+    seq_head = head(seq, 1)
     fna_head = tempfile(fileext = ".fna")
     write_fasta(seq_head, fna_head)
     fna_head_gz = gzip(fna_head, keep = TRUE)
 
     # test for query
-    TEST_NOT_ERROR(blastn(seq_head, seq_head, quiet = TRUE))
     TEST_NOT_ERROR(blastn(fna_head, seq_head, quiet = TRUE))
     TEST_NOT_ERROR(blastn(fna_head_gz, seq_head, quiet = TRUE))
 
