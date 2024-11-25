@@ -86,7 +86,14 @@ rbindfill = function(x){
 
 aggregate = function(x, by){
     u = unique(by)
-    y = vapply(u, \(y) paste0(x[by == y], collapse = "; "), character(1))
+    y = vapply(
+        u,
+        \(y){
+            z = x[by == y]
+            if(length(z) == 1) z else paste0(z, collapse = "; ")
+            },
+        character(1)
+        )
     names(y) = u
     y
     }
