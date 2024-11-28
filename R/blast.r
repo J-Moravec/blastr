@@ -180,7 +180,7 @@ blast_format = function(x, text = NULL, outfmt = NULL){
         "subject_start",
         "subject_end",
         "evalue",
-        "bit score"
+        "bit_score"
         )
 
     y
