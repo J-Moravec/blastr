@@ -121,16 +121,3 @@ rblast = function(
 
     res
     }
-
-
-match_names = function(x, where){
-    where = strfsplit(where, " ", fixed = TRUE)[[1]]
-    y = lapply(x, \(y) which(y == where))
-    names(y) = x
-
-    # sanity check
-    if(any(lengths(y) != 1))
-        stop("Non-unique match of sequence names! This shouldn't happen.")
-
-    unlist(y)
-    }

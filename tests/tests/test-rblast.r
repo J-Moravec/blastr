@@ -27,15 +27,22 @@ TEST_SET("rblast on itself returns itself as a match", {
         type = "blastp"
         )
 
-    TEST(all(res$query == res$ortholog))
+    TEST(all(res$query == res$subject))
     TEST(all(res$perc_identity == 100))
     TEST(all(res$mismatches == 0))
     })
 
 
-TEST_SET("rblast reports an error if input is not in query", {
-    x = names(seq) |> head()
-    x = c(x, "foo")
+TEST_SET("rblast reports an error if input is not in query exactly once", {
+    x = names(sequences) |> head(5)
 
-    TEST_ERROR(rblast(x, sequences, sequences, type = "blastp"))
+    TEST_ERROR(
+        rblast(c(x, "foo"), sequences, sequences, type = "blastp"),
+        pattern = "Some sequence names were not found: foo"
+        )
+
+    TEST_ERROR(
+        rblast(x, c(sequences, sequences), sequences, type = "blastp"),
+        pattern = "Non unique match for sequence names:"
+        )
     })
