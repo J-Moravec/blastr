@@ -39,10 +39,10 @@ orthologs = function(
     dir = ".", cache = ".cache/annotation.rds",
     nthreads = 1
     ){
-    faa = \(x, dir = dir) file.path(dir, paste0(x, ".faa.gz"))
-    gtf = \(x, dir = dir) file.path(dir, paste0(x, ".gtf.gz"))
+    faa = \(x) file.path(dir, paste0(x, ".faa.gz"))
+    gtf = \(x) file.path(dir, paste0(x, ".gtf.gz"))
 
-    blastr::ncbi(query, formats = c("PROT_FASTA,", "GENOME_GTF"), dir = dir)
+    blastr::ncbi(query, formats = c("PROT_FASTA", "GENOME_GTF"), dir = dir)
     blastr::ncbi(subject, formats = c("PROT_FASTA", "GENOME_GTF"), dir = dir)
 
     query_seq = faa(query) |> blastr::read_fasta()
