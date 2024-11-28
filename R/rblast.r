@@ -7,14 +7,22 @@
 #' the forward search are identified as a best hit in the backward search, the matched
 #' subject are reported.
 #'
-#' @param x id or names of the sequences to be blasted, id is the first space-separated part
-#' of the sequence name and is intepreted by blast as query name
-#' @param query,subject sequences of the query and target organisms
+#' @param x Names or ids of the sequences to be blasted, id is the first space-separated part
+#' of a sequence name and is intepreted by the NCBI BLAST+ as a query name.
+#' @param query,subject A character vector of sequences of the query and target organisms,
+#' such as one from [read_fasta()].
 #' @param type a type of blast, either nucleotide `blastn` or protein `blastp` blast
-#' @param query_db,subject_db **optional** pre-existing query and subject blast dabatases
-#' @param args **optional** a character vector of additional arguments passed to blast.
-#' @param keep **optional** keep blast searches, these are returned together with normal output
-#' in a list
+#' @param query_db,subject_db pre-existing query and subject blast dabatases.
+#' If not provided, they are created in a R's tempdir from the sequences, see [make_blast_db()].
+#' @param args a character vector of additional arguments passed to blast.
+#' @param keep Keep the forward and backward (reciprocal) blast searches,
+#' these are returned together with normal output in a named list
+#' @param sort_by A character vector of column names to sort by when chosing the best hit.
+#' By default, the values are sorted by `evalue`. Other options to consider might be `bit_score`, or `perc_identity`,
+#' but `evalue` should already provide a comprehensive metric for the sequence match.
+#' @param decreasing A logical vector ideally of the same length as `sort_by`.
+#' Whether the columns specified by `sort_by` should be sorted in decreasing order.
+#' Default for `evalue` is `FALSE` since smaller `evalue` is more significant.
 #' @return if `keep = FALSE`, a data.frame summarizing the search with query name, maching
 #' subject, percentage of their identity, alignment length, and number of mismatches.
 #' Where subject wasn't identified, values are `NA`.
@@ -30,7 +38,9 @@ rblast = function(
     query_db = NULL,
     subject_db = NULL,
     args = NULL,
-    keep = FALSE
+    keep = FALSE,
+    sort_by = "evalue",
+    decreasing = FALSE
     ){
 
     type = match.arg(type)
@@ -63,7 +73,10 @@ rblast = function(
         type = type,
         args = args
         )
-    forward_best = forward |> split(~ query) |> lapply(utils::head, 1) |> do.call(what = rbind)
+    forward_best = forward |>
+        split(~ query) |>
+        lapply(\(x) sort_by(x, x[sort_by], decreasing = decreasing) |> utils::head(1)) |>
+        do.call(what = rbind)
 
     subject_names = names(subject)
     subject_names_match = match_names(forward_best$subject, subject_names)
@@ -75,7 +88,10 @@ rblast = function(
         type = type,
         args = args
         )
-    backward_best = backward |> split(~ query) |> lapply(utils::head, 1) |> do.call(what = rbind)
+    backward_best = backward |>
+        split(~ query) |>
+        lapply(\(x) sort_by(x, x[sort_by], decreasing = decreasing) |> utils::head(1)) |>
+        do.call(what = rbind)
     backward_best = backward_best[forward_best$subject, ]
 
     res = data.frame(

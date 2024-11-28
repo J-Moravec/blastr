@@ -12,23 +12,35 @@ rblast(
   query_db = NULL,
   subject_db = NULL,
   args = NULL,
-  keep = FALSE
+  keep = FALSE,
+  sort_by = "evalue",
+  decreasing = FALSE
 )
 }
 \arguments{
-\item{x}{id or names of the sequences to be blasted, id is the first space-separated part
-of the sequence name and is intepreted by blast as query name}
+\item{x}{Names or ids of the sequences to be blasted, id is the first space-separated part
+of a sequence name and is intepreted by the NCBI BLAST+ as a query name.}
 
-\item{query, subject}{sequences of the query and target organisms}
+\item{query, subject}{A character vector of sequences of the query and target organisms,
+such as one from \code{\link[=read_fasta]{read_fasta()}}.}
 
 \item{type}{a type of blast, either nucleotide \code{blastn} or protein \code{blastp} blast}
 
-\item{query_db, subject_db}{\strong{optional} pre-existing query and subject blast dabatases}
+\item{query_db, subject_db}{pre-existing query and subject blast dabatases.
+If not provided, they are created in a R's tempdir from the sequences, see \code{\link[=make_blast_db]{make_blast_db()}}.}
 
-\item{args}{\strong{optional} a character vector of additional arguments passed to blast.}
+\item{args}{a character vector of additional arguments passed to blast.}
 
-\item{keep}{\strong{optional} keep blast searches, these are returned together with normal output
-in a list}
+\item{keep}{Keep the forward and backward (reciprocal) blast searches,
+these are returned together with normal output in a named list}
+
+\item{sort_by}{A character vector of column names to sort by when chosing the best hit.
+By default, the values are sorted by \code{evalue}. Other options to consider might be \code{bit_score}, or \code{perc_identity},
+but \code{evalue} should already provide a comprehensive metric for the sequence match.}
+
+\item{decreasing}{A logical vector ideally of the same length as \code{sort_by}.
+Whether the columns specified by \code{sort_by} should be sorted in decreasing order.
+Default for \code{evalue} is \code{FALSE} since smaller \code{evalue} is more significant.}
 }
 \value{
 if \code{keep = FALSE}, a data.frame summarizing the search with query name, maching
