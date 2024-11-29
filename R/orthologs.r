@@ -22,6 +22,11 @@
 #' Set to `cache = NULL` to disable caching.
 #' @param nthreads The number of threads parameter passed to NCBI BLAST+.
 #' The default is `1`.
+#' @param keep Keep the forward and backward (reciprocal) blast searches,
+#' @param type Run the `RBH` or `RBHS` method, default is `RBH`
+#' these are returned together with normal output in a named list
+#' ... Other arguments passed to `rblast` or `rsblast` respectively.
+#'
 #' @return A data.frame of with `length(genes)` rows and 5 columns:
 #' `query_gene`, `query_protein`, `subject_gene`, `subject_protein`, and `subject_annotation`.
 #' Where query gene couldn't be matched to query protein, or the query protein didn't rblast
@@ -33,15 +38,16 @@
 #' [blastr::read_fasta()] and [blastr::read_gtf()] for reading the `fasta` and `gtf` files
 #' respectively,
 #' [blastr::filecache()] for a simple on-disk caching,
-#' [blastr::rblast()] for the implementation of RBH
+#' [blastr::rblast()] and [blastr::rsblast()] for the implementation of RBH and RBSH
 orthologs = function(
     genes, query, subject,
     dir = ".", cache = ".cache/annotation.rds",
-    nthreads = 1
+    nthreads = 1, keep = FALSE, type = c("RBH", "RBHS")
     ){
     faa = \(x) file.path(dir, paste0(x, ".faa.gz"))
     gtf = \(x) file.path(dir, paste0(x, ".gtf.gz"))
 
+    type = match.arg(type)
     blastr::ncbi(query, formats = c("PROT_FASTA", "GENOME_GTF"), dir = dir)
     blastr::ncbi(subject, formats = c("PROT_FASTA", "GENOME_GTF"), dir = dir)
 
@@ -79,14 +85,34 @@ orthologs = function(
         ]
     map = merge(data.frame("query_gene" = genes), map, all.x = TRUE)
 
-    res = blastr::rblast(
-        map$query_protein |> na.rm(),
-        query_seq,
-        subject_seq,
-        type = "blastp",
-        args = paste0("-num_threads ", nthreads)
-        )[c("query", "subject", "annotation")]
-    names(res) = c("query_protein", "subject_protein", "subject_annotation")
+    res = switch(type,
+        "RBH" = rblast(
+            map$query_protein |> na.rm(),
+            query_seq,
+            subject_seq,
+            type = "blastp",
+            args = paste0("-num_threads ", nthreads),
+            keep = keep,
+            ...
+            ),
+        "RBHS" = rsblast(
+            map$query_protein |> na.rm(),
+            query_seq,
+            subject_seq,
+            type = "blastp",
+            args = paste0("-num_threads ", nthreads),
+            keep = keep,
+            ...
+            )
+        )
+
+    if(keep){
+        details = res[-1]
+        res = res[[1]]
+        }
+
+    res = res[c("query", "subject", "annotation", "perc_identity", "alignment_length")]
+    names(res) = c("query_protein", "subject_protein", "subject_annotation", "subject_identity", "subject_alength")
 
     res[["subject_gene"]] = subject_annotation[
         match(res[["subject_protein"]], subject_annotation[["protein_id"]]),
@@ -99,8 +125,13 @@ orthologs = function(
 
     map = merge(map, res, all = TRUE)[c(
         "query_gene", "query_protein",
-        "subject_gene", "subject_protein", "subject_annotation"
+        "subject_gene", "subject_protein", "subject_annotation", "subject_identity", "subject_alength"
         )]
+
+    if(keep){
+        map = list("search" = map, "details" = details)
+        }
+
     map
     }
 

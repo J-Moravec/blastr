@@ -10,7 +10,9 @@ orthologs(
   subject,
   dir = ".",
   cache = ".cache/annotation.rds",
-  nthreads = 1
+  nthreads = 1,
+  keep = FALSE,
+  type = c("RBH", "RBHS")
 )
 }
 \arguments{
@@ -26,6 +28,12 @@ Set to \code{cache = NULL} to disable caching.}
 
 \item{nthreads}{The number of threads parameter passed to NCBI BLAST+.
 The default is \code{1}.}
+
+\item{keep}{Keep the forward and backward (reciprocal) blast searches,}
+
+\item{type}{Run the \code{RBH} or \code{RBHS} method, default is \code{RBH}
+these are returned together with normal output in a named list
+... Other arguments passed to \code{rblast} or \code{rsblast} respectively.}
 }
 \value{
 A data.frame of with \code{length(genes)} rows and 5 columns:
@@ -54,5 +62,5 @@ Since parsing the \code{gtf} file might take some time, for repeated runs the pa
 \code{\link[=read_fasta]{read_fasta()}} and \code{\link[=read_gtf]{read_gtf()}} for reading the \code{fasta} and \code{gtf} files
 respectively,
 \code{\link[=filecache]{filecache()}} for a simple on-disk caching,
-\code{\link[=rblast]{rblast()}} for the implementation of RBH
+\code{\link[=rblast]{rblast()}} and \code{\link[=rsblast]{rsblast()}} for the implementation of RBH and RBSH
 }

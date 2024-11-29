@@ -7,6 +7,15 @@
 #' the forward search are identified as a best hit in the backward search, the matched
 #' subject are reported.
 #'
+#' The function `rblast` implements the standard reciprocal blast.
+#' The function `rsblast` implements an extended version of reciprocal blast called
+#' Reciprocal Best Similar Hit blast. In this method, the forward blast is performed as normal,
+#' but in the backward (reciprocal) blast instead of taking only the best hit,
+#' all hits that are similar enough (in terms of `bit_score`) to the best hit are considered.
+#' This should outperform RBH in a situation where many orthologs exist.
+#'
+#' Internally `rblast` is implemented within `rsblast` when `p = NULL`.
+#'
 #' @param x Names or ids of the sequences to be blasted, id is the first space-separated part
 #' of a sequence name and is intepreted by the NCBI BLAST+ as a query name.
 #' @param query,subject A character vector of sequences of the query and target organisms,
@@ -23,6 +32,9 @@
 #' @param decreasing A logical vector ideally of the same length as `sort_by`.
 #' Whether the columns specified by `sort_by` should be sorted in decreasing order.
 #' Default for `evalue` is `FALSE` since smaller `evalue` is more significant.
+#' @param n The number of subject returned for each blast search (`-max_target_seqs`), defaults to 5.
+#' @param p The proportion of `bit_score` of the best hit within which other hits will be considered.
+#' If `p = NULL`, standard RBH is run instead.
 #' @return if `keep = FALSE`, a data.frame summarizing the search with query name, maching
 #' subject, percentage of their identity, alignment length, and number of mismatches.
 #' Where subject wasn't identified, values are `NA`.
@@ -31,6 +43,20 @@
 #'
 #' @export
 rblast = function(
+    x, query, subject,
+    type = c("blastn", "blastp"),
+    query_db = NULL, subject_db = NULL,
+    args = NULL, keep = FALSE,
+    sort_by = "evalue", decreasing = FALSE,
+    n = 5
+    ){
+    rsblast(x, query, subject, type, query_db, subject_db, args, keep, sort_by, decreasing, p = NULL, n)
+    }
+
+
+#' @rdname rblast
+#' @export
+rsblast = function(
     x,
     query,
     subject,
@@ -40,11 +66,15 @@ rblast = function(
     args = NULL,
     keep = FALSE,
     sort_by = "evalue",
-    decreasing = FALSE
+    decreasing = FALSE,
+    p = 0.1,
+    n = 5
     ){
-
     type = match.arg(type)
-    args = c(args, "-max_target_seqs 5")
+    args = c(
+        args,
+        paste0("-max_target_seqs ", as.integer(n[1]))
+        )
 
     x = strfsplit(x, " ", fixed = TRUE)[[1]]
 
@@ -55,17 +85,11 @@ rblast = function(
         "blastp" = "prot"
         )
 
-    if(is.null(query_db)){
-        query_db = file.path(tempdir(), "query")
-        make_blast_db(query, out = query_db, type = db_type)
-        }
+    if(is.null(query_db))
+        query_db = make_blast_db_tmp(query, "query.db", db_type)
+    if(is.null(subject_db))
+        subject_db = make_blast_db_tmp(subject, "subject.db", db_type) 
 
-    if(is.null(subject_db)){
-        subject_db = file.path(tempdir(), "subject")
-        make_blast_db(subject, out = subject_db, type = db_type)
-        }
-
-    # first blast
     forward = blast(
         query[query_names_match],
         db = subject_db,
@@ -75,24 +99,35 @@ rblast = function(
         )
     forward_best = forward |>
         split(~ query) |>
-        lapply(\(x) sort_by(x, x[sort_by], decreasing = decreasing) |> utils::head(1)) |>
+        lapply(best_sorted_hit, sort_by = sort_by, decreasing = decreasing) |>
         do.call(what = rbind)
 
     subject_names = names(subject)
     subject_names_match = match_names(forward_best$subject, subject_names)
 
-    # second blast
     backward = blast(
         subject[subject_names_match],
         db = query_db, outfmt = 6,
         type = type,
         args = args
         )
-    backward_best = backward |>
-        split(~ query) |>
-        lapply(\(x) sort_by(x, x[sort_by], decreasing = decreasing) |> utils::head(1)) |>
-        do.call(what = rbind)
-    backward_best = backward_best[forward_best$subject, ]
+
+    if(is.null(p)){
+        backward_best = backward |>
+            split(~ query) |>
+            lapply(best_sorted_hit, sort_by = sort_by, decreasing = decreasing) |>
+            do.call(what = rbind)
+        backward_best = backward_best[forward_best$subject, ]
+        is_ortholog = forward_best$query == backward_best$subject
+        } else {
+        backward_best = backward |>
+            split(~ query) |>
+            lapply(best_sorted_bit_scores, sort_by = sort_by, decreasing = decreasing, p = p)
+        backward_best = backward_best[forward_best$subject]
+        backward_best_subject = lapply(backward_best, getElement, "subject")
+        backward_best = do.call(what = rbind, backward_best)
+        is_ortholog = mapply(`%in%`, forward_best$query, backward_best_subject, SIMPLIFY = TRUE)
+        }
 
     res = data.frame(
         "query" = forward_best$query,
@@ -103,15 +138,14 @@ rblast = function(
         "annotation" = subject_names[subject_names_match]
         )
 
-    # remove what is actually not a match
-    res[forward_best$query != backward_best$subject, -1] = NA
+    res[!is_ortholog, -1] = NA
     res = res[match(x, res$query),]
     rownames(res) = NULL
     res$query = x
 
     if(keep){
         res = list(
-            "rblast" = res,
+            "search" = res,
             "forward" = forward,
             "forward_best" = forward_best,
             "backward" = backward,
@@ -120,4 +154,26 @@ rblast = function(
         }
 
     res
+    }
+
+
+best_sorted_hit = function(x, sort_by, decreasing){
+    sort_by(x, x[sort_by], decreasing = decreasing) |> utils::head(1)
+    }
+
+
+best_sorted_bit_scores = function(x, sort_by, decreasing, p){
+    x = sort_by(x, x[sort_by], decreasing = decreasing)
+    threshold = max(x[["bit_score"]], na.rm = TRUE) * (1 - p)
+    x[which(x[["bit_score"]] > threshold),]
+    }
+
+
+make_blast_db_tmp = function(x, name = "db", type = c("nucl", "prot")){
+    type = match.arg(type)
+
+    file = file.path(tempdir(), name)
+    make_blast_db(x, out = file, type = type)
+
+    file
     }

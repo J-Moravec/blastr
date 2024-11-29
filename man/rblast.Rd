@@ -2,6 +2,7 @@
 % Please edit documentation in R/rblast.r
 \name{rblast}
 \alias{rblast}
+\alias{rsblast}
 \title{Reciprocal BLAST}
 \usage{
 rblast(
@@ -14,7 +15,23 @@ rblast(
   args = NULL,
   keep = FALSE,
   sort_by = "evalue",
-  decreasing = FALSE
+  decreasing = FALSE,
+  n = 5
+)
+
+rsblast(
+  x,
+  query,
+  subject,
+  type = c("blastn", "blastp"),
+  query_db = NULL,
+  subject_db = NULL,
+  args = NULL,
+  keep = FALSE,
+  sort_by = "evalue",
+  decreasing = FALSE,
+  p = 0.1,
+  n = 5
 )
 }
 \arguments{
@@ -41,6 +58,11 @@ but \code{evalue} should already provide a comprehensive metric for the sequence
 \item{decreasing}{A logical vector ideally of the same length as \code{sort_by}.
 Whether the columns specified by \code{sort_by} should be sorted in decreasing order.
 Default for \code{evalue} is \code{FALSE} since smaller \code{evalue} is more significant.}
+
+\item{n}{The number of subject returned for each blast search (\code{-max_target_seqs}), defaults to 5.}
+
+\item{p}{The proportion of \code{bit_score} of the best hit within which other hits will be considered.
+If \code{p = NULL}, standard RBH is run instead.}
 }
 \value{
 if \code{keep = FALSE}, a data.frame summarizing the search with query name, maching
@@ -57,4 +79,13 @@ BLAST reciprocal best hit search will first perform a forward search, take the b
 and then performs a backward search using these best hits. If the sequence used for
 the forward search are identified as a best hit in the backward search, the matched
 subject are reported.
+
+The function \code{rblast} implements the standard reciprocal blast.
+The function \code{rsblast} implements an extended version of reciprocal blast called
+Reciprocal Best Similar Hit blast. In this method, the forward blast is performed as normal,
+but in the backward (reciprocal) blast instead of taking only the best hit,
+all hits that are similar enough (in terms of \code{bit_score}) to the best hit are considered.
+This should outperform RBH in a situation where many orthologs exist.
+
+Internally \code{rblast} is implemented within \code{rsblast} when \code{p = NULL}.
 }
