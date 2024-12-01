@@ -25,7 +25,7 @@
 #' @param keep Keep the forward and backward (reciprocal) blast searches,
 #' @param type Run the `RBH` or `RBHS` method, default is `RBH`
 #' these are returned together with normal output in a named list
-#' ... Other arguments passed to `rblast` or `rsblast` respectively.
+#' @param ... Other arguments passed to `rblast` or `rsblast` respectively.
 #'
 #' @return A data.frame of with `length(genes)` rows and 5 columns:
 #' `query_gene`, `query_protein`, `subject_gene`, `subject_protein`, and `subject_annotation`.
@@ -42,7 +42,8 @@
 orthologs = function(
     genes, query, subject,
     dir = ".", cache = ".cache/annotation.rds",
-    nthreads = 1, keep = FALSE, type = c("RBH", "RBHS")
+    nthreads = 1, keep = FALSE, type = c("RBH", "RBHS"),
+    ...
     ){
     faa = \(x) file.path(dir, paste0(x, ".faa.gz"))
     gtf = \(x) file.path(dir, paste0(x, ".gtf.gz"))

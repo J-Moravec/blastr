@@ -1,5 +1,5 @@
-if(!nzchar(Sys.which("blastn"))){
-    message("SKIP test-blast.r -- no blastn binary")
+if(!nzchar(Sys.which("blastp"))){
+    message("SKIP test-blast.r -- no blastp binary")
     return(invisible())
     }
 
@@ -45,4 +45,20 @@ TEST_SET("rblast reports an error if input is not in query exactly once", {
         rblast(x, c(sequences, sequences), sequences, type = "blastp"),
         pattern = "Non unique match for sequence names:"
         )
+    })
+
+
+TEST_SET("rsblast on itself returns itself as a match depending on p", {
+    res = rsblast(
+        head(sequences, 5) |> names(),
+        query = sequences,
+        subject = sequences,
+        type = "blastp",
+        n = 10,
+        p = 0.2
+        )
+
+    TEST(all(res$query == res$subject))
+    TEST(all(res$perc_identity == 100))
+    TEST(all(res$mismatches == 0))
     })
