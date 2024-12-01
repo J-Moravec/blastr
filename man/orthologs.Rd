@@ -12,7 +12,7 @@ orthologs(
   cache = ".cache/annotation.rds",
   nthreads = 1,
   keep = FALSE,
-  type = c("RBH", "RBHS"),
+  type = c("RBH", "RBSH"),
   ...
 )
 }
@@ -32,7 +32,7 @@ The default is \code{1}.}
 
 \item{keep}{Keep the forward and backward (reciprocal) blast searches,}
 
-\item{type}{Run the \code{RBH} or \code{RBHS} method, default is \code{RBH}
+\item{type}{Run the \code{RBH} or \code{RBSH} method, default is \code{RBH}
 these are returned together with normal output in a named list}
 
 \item{...}{Other arguments passed to \code{rblast} or \code{rsblast} respectively.}

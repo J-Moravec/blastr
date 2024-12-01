@@ -23,7 +23,7 @@
 #' @param nthreads The number of threads parameter passed to NCBI BLAST+.
 #' The default is `1`.
 #' @param keep Keep the forward and backward (reciprocal) blast searches,
-#' @param type Run the `RBH` or `RBHS` method, default is `RBH`
+#' @param type Run the `RBH` or `RBSH` method, default is `RBH`
 #' these are returned together with normal output in a named list
 #' @param ... Other arguments passed to `rblast` or `rsblast` respectively.
 #'
@@ -42,7 +42,7 @@
 orthologs = function(
     genes, query, subject,
     dir = ".", cache = ".cache/annotation.rds",
-    nthreads = 1, keep = FALSE, type = c("RBH", "RBHS"),
+    nthreads = 1, keep = FALSE, type = c("RBH", "RBSH"),
     ...
     ){
     faa = \(x) file.path(dir, paste0(x, ".faa.gz"))
@@ -96,7 +96,7 @@ orthologs = function(
             keep = keep,
             ...
             ),
-        "RBHS" = rsblast(
+        "RBSH" = rsblast(
             map$query_protein |> na.rm(),
             query_seq,
             subject_seq,
