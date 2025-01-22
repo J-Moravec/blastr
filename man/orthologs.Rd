@@ -13,6 +13,8 @@ orthologs(
   nthreads = 1,
   keep = FALSE,
   type = c("RBH", "RBSH"),
+  qgene = "gene_id",
+  sgene = "gene_id",
   ...
 )
 }
@@ -34,6 +36,9 @@ The default is \code{1}.}
 
 \item{type}{Run the \code{RBH} or \code{RBSH} method, default is \code{RBH}
 these are returned together with normal output in a named list}
+
+\item{qgene, sgene}{a column name for query and subject where the gene names are located.
+Typically, this is stored in \code{gene_id} but in some cases a \code{gene} column might also exist.}
 
 \item{...}{Other arguments passed to \code{rblast} or \code{rsblast} respectively.}
 }

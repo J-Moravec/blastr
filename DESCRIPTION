@@ -3,7 +3,7 @@ Type: Package
 Title: binding to NCBI blast
 Description: blastr provides dependency-free binding to the NCBI blast
     as well as a few useful functions.
-Version: 0.0.1
+Version: 0.0.2
 Date: 2024-11-12
 Authors@R:
     person(

@@ -26,6 +26,8 @@
 #' @param type Run the `RBH` or `RBSH` method, default is `RBH`
 #' these are returned together with normal output in a named list
 #' @param ... Other arguments passed to `rblast` or `rsblast` respectively.
+#' @param qgene,sgene a column name for query and subject where the gene names are located.
+#' Typically, this is stored in `gene_id` but in some cases a `gene` column might also exist.
 #'
 #' @return A data.frame of with `length(genes)` rows and 5 columns:
 #' `query_gene`, `query_protein`, `subject_gene`, `subject_protein`, and `subject_annotation`.
@@ -43,6 +45,7 @@ orthologs = function(
     genes, query, subject,
     dir = ".", cache = ".cache/annotation.rds",
     nthreads = 1, keep = FALSE, type = c("RBH", "RBSH"),
+    qgene = "gene_id", sgene = "gene_id",
     ...
     ){
     faa = \(x) file.path(dir, paste0(x, ".faa.gz"))
@@ -60,21 +63,21 @@ orthologs = function(
             gtf(query),
             feature = "CDS",
             attributes = TRUE
-            )[c("gene_id", "protein_id")]
+            )[c(qgene, "protein_id")]
         subject_annotation = read_gtf(
             gtf(subject),
             feature = "CDS",
             attributes = TRUE
-            )[c("gene_id", "protein_id")]
+            )[c(sgene, "protein_id")]
         } else {
         query_annotation = filecache(
             cache,
             read_gtf, gtf(query), feature = "CDS", attributes = TRUE
-            )[c("gene_id", "protein_id")]
+            )[c(qgene, "protein_id")]
         subject_annotation = filecache(
             cache,
             read_gtf, gtf(subject), feature = "CDS", attributes = TRUE
-            )[c("gene_id", "protein_id")]
+            )[c(sgene, "protein_id")]
         }
 
     map = data.frame(
@@ -82,7 +85,7 @@ orthologs = function(
         )
     map[["query_gene"]] = query_annotation[
         match(map[["query_protein"]], query_annotation[["protein_id"]]),
-        "gene_id"
+        qgene
         ]
     map = merge(data.frame("query_gene" = genes), map, all.x = TRUE)
 
@@ -117,7 +120,7 @@ orthologs = function(
 
     res[["subject_gene"]] = subject_annotation[
         match(res[["subject_protein"]], subject_annotation[["protein_id"]]),
-        "gene_id"
+        sgene
         ]
     res[["subject_annotation"]] = res[["subject_annotation"]] |>
         strfsplit(" ", fixed = TRUE) |>
