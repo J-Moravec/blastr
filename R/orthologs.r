@@ -80,9 +80,12 @@ orthologs = function(
             )[c(sgene, "protein_id")]
         }
 
-    map = data.frame(
-        "query_protein" = strfsplit(names(query_seq), " ", fixed = TRUE)[[1]]
-        )
+    # Prepare query map
+    map = strfsplit(names(query_seq), " ", fixed = TRUE)
+    names(map) = c("query_protein", "query_annotation")
+    map = as.data.frame(map)
+    map[["query_annotation"]] = map[["query_annotation"]] |>
+        sub(pattern = " \\[[A-Za-z ]*\\]$", replacement = "")
     map[["query_gene"]] = query_annotation[
         match(map[["query_protein"]], query_annotation[["protein_id"]]),
         qgene
@@ -128,7 +131,7 @@ orthologs = function(
         sub(pattern = " \\[[A-Za-z ]*\\]$", replacement = "")
 
     map = merge(map, res, all = TRUE)[c(
-        "query_gene", "query_protein",
+        "query_gene", "query_protein", "query_annotation",
         "subject_gene", "subject_protein", "subject_annotation", "subject_identity", "subject_alength"
         )]
 
