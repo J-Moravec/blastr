@@ -39,6 +39,27 @@
 NULL
 
 
+# For the purpose of printing, or writing, it is faster
+# to just insert newline instead of spliting text into
+# list of nchar long, see commented out alternative
+# implementation
+wrap = function(x, nchar){
+    gsub(
+        paste0("(.{1,", nchar, "})"),
+        "\\1\n",
+        x
+        )
+    }
+
+#wrap = function(x, nchar = 80){
+#    lapply(x, \(s){
+#        i = seq(1, nchar(s), by = nchar)
+#        s = substring(s, i, i + nchar - 1)
+#        s
+#        })
+#    }
+
+
 #' @rdname sequences
 #' @export
 read_fasta = function(file){
@@ -70,11 +91,7 @@ write_fasta = function(x, file = "", nchar = 80){
 
     if(!is.null(nchar)){
         nchar = as.numeric(nchar)
-        x = gsub(
-            paste0("(.{1,", nchar, "})"),
-            "\\1\n",
-            x
-            )
+        x = wrap(x, nchar)
         }
 
     text = paste0(">", names(x), "\n", x)
@@ -113,10 +130,19 @@ is_sequences = function(x){
 
 #' @rdname sequences
 #' @export
-print.sequences = function(x, ...){
-    print(unclass(x))
+print.sequences = function(x, nchar = 70, ...){
+    if(is.numeric(nchar)){
+        cat(paste0("[", seq_along(x), "] ", names(x), "\n", wrap(x, nchar)), sep = "\n")
+        } else {
+        print(unclass(x))
+        }
     }
 
+
+#' @export
+"[.sequences" = function(x, i){
+    structure(unclass(x)[i], class = class(x))
+    }
 
 #' @rdname sequences
 #' @export

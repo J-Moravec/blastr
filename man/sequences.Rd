@@ -16,7 +16,7 @@ write_fasta(x, file = "", nchar = 80)
 
 is_sequences(x)
 
-\method{print}{sequences}(x, ...)
+\method{print}{sequences}(x, nchar = 70, ...)
 
 write_fasta_temp(x)
 }

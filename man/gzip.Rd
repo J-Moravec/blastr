@@ -3,11 +3,14 @@
 \name{gzip}
 \alias{gzip}
 \alias{gunzip}
+\alias{is_gzip}
 \title{Compress and decompress using gzip}
 \usage{
 gzip(x, out = NULL, overwrite = FALSE, keep = FALSE)
 
 gunzip(x, out = NULL, overwrite = FALSE, keep = FALSE)
+
+is_gzip(x)
 }
 \arguments{
 \item{x}{file to be compressed or decompressed using the \code{gz} algorithm}
@@ -36,6 +39,9 @@ appending (for \code{gzip()}) or removing (for \code{gunzip()}) the \code{.gz} e
 Once the file is successfully compressed/decompressed, the input file is removed
 unless \code{keep = TRUE} is specified.
 If for some reason the process fails, broken files are removed.
+
+The \code{is_gzip()} is a simple utility function to check if the file is compressed
+by gzip by comparing first two bytes of the file to a magic number "1f 8b".
 }
 \examples{
 # Compression and decompression

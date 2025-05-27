@@ -71,6 +71,9 @@ compress_or_decompress = function(
 #' unless `keep = TRUE` is specified.
 #' If for some reason the process fails, broken files are removed.
 #'
+#' The `is_gzip()` is a simple utility function to check if the file is compressed
+#' by gzip by comparing first two bytes of the file to a magic number "1f 8b".
+#'
 #' @param x file to be compressed or decompressed using the `gz` algorithm
 #' @param out **optional** output file, see details
 #' @param overwrite **optional** overwrite existing file
@@ -119,4 +122,13 @@ gunzip = function(x, out = NULL, overwrite = FALSE, keep = FALSE){
         overwrite = overwrite,
         keep = keep
         )
+    }
+
+
+#' @rdname gzip
+#' @export
+is_gzip = function(x){
+    bytes = readBin(x, "raw", 2)
+    magic_number = charToRaw("\x1F\x8b")
+    identical(bytes, magic_number)
     }
