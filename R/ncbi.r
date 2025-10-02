@@ -218,7 +218,7 @@ ncbi_download = function(
         )
 
     op = options("timeout" = timeout)
-    err = utils::download.file(url, dest, quiet = quiet)
+    err = utils::download.file(url, dest, quiet = quiet, mode = "wb")
     ok = TRUE
     options(op)
 
