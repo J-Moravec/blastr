@@ -261,6 +261,7 @@ ncbi_flatten = function(
     assembly_name = get_assembly_name(
         file.path(dir, "ncbi_dataset", "data", "assembly_data_report.jsonl")
         )
+    assembly_name = gsub(" ", "_", assembly_name)
     mapping = ncbi_format_mapping_table(prefix, assembly_name, formats)
     old_files = file.path(dir, mapping$old)
 
