@@ -53,6 +53,7 @@ read_gtf = function(x, feature = NULL, attributes = FALSE){
     if(attributes)
         y = cbind(y[-9], y$attribute |> parse_attributes())
 
+    rownames(y) = NULL
     y
     }
 
@@ -60,7 +61,9 @@ read_gtf = function(x, feature = NULL, attributes = FALSE){
 #' @rdname read_gtf
 #' @export
 parse_attributes = function(x){
-    y = strsplit(x, "\"; ", fixed = TRUE)
+    # trailing "; " caused incorrect parsing
+    y = sub(x, pattern = ";[ ]*$", replacement = "")
+    y = strsplit(y, "\"; ", fixed = TRUE)
     for(i in seq_along(y)){
         z = y[[i]] |> strfsplit(pattern = " ", fixed = TRUE)
         y[[i]] = aggregate(z[[2]], z[[1]])

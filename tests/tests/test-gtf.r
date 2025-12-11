@@ -7,6 +7,7 @@ TEST_SET("read_gtf can read files in gtf format", {
 
     # subset for less work
     g = g[g$feature == "gene",]
+    rownames(g) = NULL
     TEST(nrow(g) == 2155)
 
     attr = parse_attributes(g$attribute)
@@ -21,4 +22,12 @@ TEST_SET("read_gtf can read files in gtf format", {
     rownames(gt) = NULL
     rownames(attr) = NULL
     TEST(identical(gt[-c(1:8)], attr))
+
+    # trailing ; with space was parsec correctly: `; `
+    # trailing ; without space failed `;`
+    # and `;` was then preserved in the last column of a row.
+    # caused 
+    g = read_gtf("../data/test.gtf", attributes = TRUE)
+    TEST(identical(dim(g), c(2L, 10L)))
+    TEST(identical(g[2,10], "transcript_1"))
     })
