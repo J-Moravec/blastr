@@ -1,3 +1,7 @@
+# blastr 0.0.4
+
+* Added `task` argument for blast calls
+
 # blastr 0.0.3
 
 * New `is_gzip()` function to test if a file is gzipped

@@ -24,7 +24,29 @@
 #'
 #' If the `outfmt` is one of the tabular formats (6, 7, or 10), the NCBI BLAST+  is parsed
 #' and converted into a `data.frame`. As of now, field customization is not supported.
-
+#'
+#' The `task` argument specifies a particular preset of parameters for given blast algorithm.
+#' These presets are optimized for a particular practical tasks, such as finding match
+#' between very short sequences (`blastn-short` for blastn), or finding match between long
+#' sequences (`megablast` for blastn).
+#'
+#' The tasks are: (*default*)
+#'
+#' * blastn: blastn, blastn-short, rmblast, *megablast*, dc-megablast
+#' * blastp: *blastp*, blastp-fast, blastp-short
+#' * blastx: *blastx*, blastx-fast
+#' * tblastn: *tblastn*, tblastn-fast
+#' * tblastx:
+#'
+#' The names are generally very self-explanatory, *fast* sacrifices precision for speed,
+#' *short* is optimized for short sequences, *megablast* is optimized for long,
+#' and *dc-megablast* for long discontinued, and the default version is golden middle.
+#'
+#' The `tblastx` doesn't have tasks, and *rmblast* is undocumented extension for RepeatMasker.
+#' For details on tasks, see:
+#'
+#'[https://www.ncbi.nlm.nih.gov/books/NBK279684/#appendices.Options_for_the_commandline_a](here).
+#'
 #' @param query A fasta file or a sequences object.
 #' @param subject Fasta file or a sequences object against which to blast,
 #' one of `subject or `db` needs to be specified.
@@ -34,7 +56,8 @@
 #' `tblastn` or `tblastx`, defaults to `blastn`.
 #' @param out An output path to store BLAST results, the default is to not store any results.
 #' @param outfmt BLAST output format, defaults to `0` (Pairwise).
-#' @param args AA character vector of additional arguments passed to [blast()].
+#' @param task a particular blast preset to run, see details
+#' @param args A character vector of additional arguments passed to [blast()].
 #' @param quiet If `TRUE`, any blast output to stdout and stderr is suppressed,
 #' use this when using [blast()] within a pipeline and you want to reduce the text output
 #' to console. This is also make potential error harder to debug. The default is `FALSE`.
@@ -49,6 +72,7 @@ blast = function(
     type = NULL,
     out = NULL,
     outfmt = NULL,
+    task = NULL,
     args = NULL,
     quiet = FALSE
     ){
@@ -84,6 +108,7 @@ blast = function(
         if(!is.null(subject)) c("-subject", subject),
         "-out", out,
         if(!is.null(outfmt)) c("-outfmt", outfmt),
+        if(!is.null(task)) c("-task", task),
         if(!is.null(args)) args
         )
 
@@ -106,9 +131,11 @@ blast = function(
 blastn = function(
     query, subject = NULL, db = NULL,
     out = NULL, outfmt = NULL,
-    args = NULL, quiet = FALSE
+    args = NULL, quiet = FALSE,
+    task = c("megablast", "dc-megablast", "blastn", "blastn-short", "rmblastn")
     ){
-    blast(query, subject, db, out, outfmt, args, type = "blastn", quiet = quiet)
+    task = match.arg(task)
+    blast(query, subject, db, out, outfmt, args, type = "blastn", task = task, quiet = quiet)
     }
 
 
@@ -117,9 +144,11 @@ blastn = function(
 blastp = function(
     query, subject = NULL, db = NULL,
     out = NULL, outfmt = NULL,
-    args = NULL, quiet = FALSE
+    args = NULL, quiet = FALSE,
+    task = c("blastp", "blastp-fast", "blastp-short")
     ){
-    blast(query, subject, db, out, outfmt, args, type= "blastp", quiet = quiet)
+    task = match.arg(task)
+    blast(query, subject, db, out, outfmt, args, type = "blastp", task = task, quiet = quiet)
     }
 
 
@@ -128,9 +157,11 @@ blastp = function(
 blastx = function(
     query, subject = NULL, db = NULL,
     out = NULL, outfmt = NULL,
-    args = NULL, quiet = FALSE
+    args = NULL, quiet = FALSE,
+    task = c("blastx", "blastx-fast")
     ){
-    blast(query, subject, db, out, outfmt, args, type= "blastx", quiet = quiet)
+    task = match.arg(task)
+    blast(query, subject, db, out, outfmt, args, type = "blastx", task = task, quiet = quiet)
     }
 
 
@@ -139,9 +170,11 @@ blastx = function(
 tblastn = function(
     query, subject = NULL, db = NULL,
     out = NULL, outfmt = NULL,
-    args = NULL, quiet = FALSE
+    args = NULL, quiet = FALSE,
+    task = c("tblastn", "tblastn-fast")
     ){
-    blast(query, subject, db, out, outfmt, args, type= "tblastn", quiet = quiet)
+    task = match.arg(task)
+    blast(query, subject, db, out, outfmt, args, type = "tblastn", task = task, quiet = quiet)
     }
 
 

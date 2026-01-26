@@ -16,6 +16,7 @@ blast(
   type = NULL,
   out = NULL,
   outfmt = NULL,
+  task = NULL,
   args = NULL,
   quiet = FALSE
 )
@@ -27,7 +28,8 @@ blastn(
   out = NULL,
   outfmt = NULL,
   args = NULL,
-  quiet = FALSE
+  quiet = FALSE,
+  task = c("megablast", "dc-megablast", "blastn", "blastn-short", "rmblastn")
 )
 
 blastp(
@@ -37,7 +39,8 @@ blastp(
   out = NULL,
   outfmt = NULL,
   args = NULL,
-  quiet = FALSE
+  quiet = FALSE,
+  task = c("blastp", "blastp-fast", "blastp-short")
 )
 
 blastx(
@@ -47,7 +50,8 @@ blastx(
   out = NULL,
   outfmt = NULL,
   args = NULL,
-  quiet = FALSE
+  quiet = FALSE,
+  task = c("blastx", "blastx-fast")
 )
 
 tblastn(
@@ -57,7 +61,8 @@ tblastn(
   out = NULL,
   outfmt = NULL,
   args = NULL,
-  quiet = FALSE
+  quiet = FALSE,
+  task = c("tblastn", "tblastn-fast")
 )
 
 tblastx(
@@ -86,7 +91,9 @@ one of \code{subject} or \code{db} needs to be specified.}
 
 \item{outfmt}{BLAST output format, defaults to \code{0} (Pairwise).}
 
-\item{args}{AA character vector of additional arguments passed to \code{\link[=blast]{blast()}}.}
+\item{task}{a particular blast preset to run, see details}
+
+\item{args}{A character vector of additional arguments passed to \code{\link[=blast]{blast()}}.}
 
 \item{quiet}{If \code{TRUE}, any blast output to stdout and stderr is suppressed,
 use this when using \code{\link[=blast]{blast()}} within a pipeline and you want to reduce the text output
@@ -119,4 +126,27 @@ and will be removed at the end of the current R session.
 
 If the \code{outfmt} is one of the tabular formats (6, 7, or 10), the NCBI BLAST+  is parsed
 and converted into a \code{data.frame}. As of now, field customization is not supported.
+
+The \code{task} argument specifies a particular preset of parameters for given blast algorithm.
+These presets are optimized for a particular practical tasks, such as finding match
+between very short sequences (\code{blastn-short} for blastn), or finding match between long
+sequences (\code{megablast} for blastn).
+
+The tasks are: (\emph{default})
+\itemize{
+\item blastn: blastn, blastn-short, rmblast, \emph{megablast}, dc-megablast
+\item blastp: \emph{blastp}, blastp-fast, blastp-short
+\item blastx: \emph{blastx}, blastx-fast
+\item tblastn: \emph{tblastn}, tblastn-fast
+\item tblastx:
+}
+
+The names are generally very self-explanatory, \emph{fast} sacrifices precision for speed,
+\emph{short} is optimized for short sequences, \emph{megablast} is optimized for long,
+and \emph{dc-megablast} for long discontinued, and the default version is golden middle.
+
+The \code{tblastx} doesn't have tasks, and \emph{rmblast} is undocumented extension for RepeatMasker.
+For details on tasks, see:
+
+\href{here}{https://www.ncbi.nlm.nih.gov/books/NBK279684/#appendices.Options_for_the_commandline_a}.
 }
